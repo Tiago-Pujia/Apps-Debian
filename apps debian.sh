@@ -40,10 +40,13 @@ prompt_install "instalar fastfetch" sudo apt install fastfetch -y
 # Instalar software de desarrollo #
 prompt_install "instalar Java (OpenJDK 17)" sudo apt install openjdk-17-jdk -y
 prompt_install "instalar Git" sudo apt install git -y
+prompt_install "instalar GitHub CLI (gh)" sudo apt install gh -y
+prompt_install "instalar JQ (procesador JSON)" sudo apt install jq -y
 prompt_install "instalar Vim" sudo apt install vim -y
 prompt_install "instalar Htop" sudo apt install htop -y
 prompt_install "instalar Btop" sudo apt install btop -y
 prompt_install "instalar Postman" sudo snap install postman
+
 
 # Node.js y npm (LTS) #
 echo ""
