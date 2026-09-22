@@ -98,7 +98,39 @@ else
 fi
 
 # Antigravity #
-prompt_install "instalar Antigravity" sudo apt install antigravity -y
+echo ""
+read -p "${YELLOW}¿Deseas instalar Antigravity? (Y/y = sí, N/n = no):${NC} " response_antigravity
+if [[ "$response_antigravity" == "Y" || "$response_antigravity" == "y" ]]; then
+  printf "%b\n" "${GREEN}✓ Descargando e instalando Antigravity...${NC}"
+  wget "https://storage.googleapis.com/antigravity-public/antigravity-hub/2.16.0-4917332007583744/linux-x64/Antigravity.tar.gz" -O /tmp/Antigravity.tar.gz
+  mkdir -p /tmp/antigravity_temp
+  tar -xzf /tmp/Antigravity.tar.gz -C /tmp/antigravity_temp
+  sudo rm -rf /opt/antigravity
+  sudo mv /tmp/antigravity_temp/Antigravity-x64 /opt/antigravity
+  rm -rf /tmp/antigravity_temp /tmp/Antigravity.tar.gz
+
+  sudo chown root:root /opt/antigravity/chrome-sandbox
+  sudo chmod 4755 /opt/antigravity/chrome-sandbox
+
+  sudo rm -f /usr/local/bin/antigravity
+  sudo ln -s /opt/antigravity/antigravity /usr/local/bin/antigravity
+
+  sudo tee /usr/share/applications/antigravity.desktop > /dev/null <<'EOF'
+[Desktop Entry]
+Name=Antigravity
+Comment=Antigravity 2.0 Agent Hub
+Exec=/opt/antigravity/antigravity %U
+Icon=/opt/antigravity/resources/app.asar.unpacked/build/icon.png
+Type=Application
+Categories=Development;
+StartupWMClass=Antigravity
+EOF
+
+  sudo update-desktop-database /usr/share/applications 2>/dev/null || true
+  printf "%b\n" "${GREEN}✓ Antigravity instalado y configurado correctamente.${NC}"
+else
+  printf "%b\n" "${RED}✗ Saltado${NC}"
+fi
 
 # OpenCode (CLI y Desktop) #
 echo ""
