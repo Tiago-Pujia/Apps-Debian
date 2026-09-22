@@ -1,19 +1,27 @@
 #!/bin/bash
-# 1. Asignar permisos con chmod +x apps.sh
-# 2. Ejecutar como ./apps.sh
+# 1. Asignar permisos con chmod +x "apps debian.sh"
+# 2. Ejecutar como ./"apps debian.sh"
 
 # Definir colores ANSI
 RED=$'\033[1;31m'
 GREEN=$'\033[1;32m'
 YELLOW=$'\033[1;33m'
 CYAN=$'\033[1;36m'
+MAGENTA=$'\033[1;35m'
 NC=$'\033[0m' # Sin color
 
 clear
 
 printf "%b\n" "${CYAN}==========================================================${NC}"
-printf "%b\n" "${GREEN}INICIANDO SCRIPT APLICACIONES BASICAS DEBIAN${NC}"
+printf "%b\n" "${GREEN}    INICIANDO SCRIPT DE APLICACIONES DEBIAN / UBUNTU    ${NC}"
 printf "%b\n" "${CYAN}==========================================================${NC}"
+
+# Función para imprimir cabeceras de sección visuales
+print_section() {
+  printf "\n%b\n" "${MAGENTA}==========================================================${NC}"
+  printf "%b\n" "${MAGENTA} 📦 SECCIÓN: $1${NC}"
+  printf "%b\n" "${MAGENTA}==========================================================${NC}"
+}
 
 # Función para pedir confirmación antes de instalar/desinstalar
 prompt_install() {
@@ -21,23 +29,29 @@ prompt_install() {
   shift
   read -p "$(printf '%b' "${YELLOW}\n¿Deseas $description? (Y/y = sí, N/n = no):${NC} ")" response
   if [[ "$response" == "Y" || "$response" == "y" ]]; then
-    printf "%b\n" "${GREEN}✓ Instalando...${NC}"
+    printf "%b\n" "${GREEN}✓ Instalando / Ejecutando...${NC}"
     "$@"
   else
     printf "%b\n" "${RED}✗ Saltado${NC}"
   fi
 }
 
-# Actualizar la lista de paquetes y acceder como root #
+# ==========================================================
+# 1. ACTUALIZACIÓN DEL SISTEMA Y GESTIÓN DE PAQUETES
+# ==========================================================
+print_section "Actualización del Sistema y Gestores de Paquetes"
+
 prompt_install "actualizar la lista de paquetes (apt update)" sudo apt update
 prompt_install "actualizar los paquetes instalados (apt upgrade)" sudo apt upgrade -y
-
-# Instalar Flatpak y agregar el repositorio de Flathub #
 prompt_install "instalar Flatpak" sudo apt install flatpak -y
 prompt_install "agregar repositorio Flathub" sudo flatpak remote-add --if-not-exists flathub https://flathub.org/repo/flathub.flatpakrepo
-prompt_install "instalar fastfetch" sudo apt install fastfetch -y
+prompt_install "instalar Fastfetch" sudo apt install fastfetch -y
 
-# Instalar software de desarrollo #
+# ==========================================================
+# 2. DESARROLLO & TERMINAL
+# ==========================================================
+print_section "Desarrollo & Terminal"
+
 prompt_install "instalar Java (OpenJDK 17)" sudo apt install openjdk-17-jdk -y
 prompt_install "instalar Git" sudo apt install git -y
 prompt_install "instalar GitHub CLI (gh)" sudo apt install gh -y
@@ -46,7 +60,6 @@ prompt_install "instalar Vim" sudo apt install vim -y
 prompt_install "instalar Htop" sudo apt install htop -y
 prompt_install "instalar Btop" sudo apt install btop -y
 prompt_install "instalar Postman" sudo snap install postman
-
 
 # Node.js y npm (LTS) #
 echo ""
@@ -71,19 +84,41 @@ else
   printf "%b\n" "${RED}✗ Saltado${NC}"
 fi
 
-# Instalar aplicaciones básicas #
-prompt_install "instalar Mousepad" sudo apt install mousepad -y
-prompt_install "instalar Pinta (edición de imágenes)" flatpak install flathub com.github.PintaProject.Pinta -y
-prompt_install "instalar Spotify" flatpak install -y flathub com.spotify.Client
-prompt_install "instalar Github Desktop" flatpak install -y flathub io.github.shiftey.Desktop
-prompt_install "instalar Teams" flatpak install -y flathub com.github.IsmaelMartinez.teams_for_linux
-prompt_install "instalar Vivaldi" flatpak install -y flathub com.vivaldi.Vivaldi
-prompt_install "instalar Zen" flatpak install -y flathub app.zen_browser.zen
-prompt_install "instalar Steam" sudo apt install steam -y
-prompt_install "instalar OBS Studio" flatpak install -y flathub com.obsproject.Studio
-prompt_install "instalar Draw.io" flatpak install -y flathub com.jgraph.drawio.desktop
-prompt_install "instalar Discord" flatpak install -y flathub com.discordapp.Discord
-prompt_install "instalar Filezilla" sudo apt install filezilla
+# Visual Studio Code #
+echo ""
+read -p "${YELLOW}¿Deseas instalar Visual Studio Code? (Y/y = sí, N/n = no):${NC} " response_vscode
+if [[ "$response_vscode" == "Y" || "$response_vscode" == "y" ]]; then
+  printf "%b\n" "${GREEN}✓ Instalando Visual Studio Code...${NC}"
+  wget 'https://go.microsoft.com/fwlink/?LinkID=760868' -O vscode.deb
+  chmod +x vscode.deb
+  sudo apt install ./vscode.deb -y
+  rm -f vscode.deb
+else
+  printf "%b\n" "${RED}✗ Saltado${NC}"
+fi
+
+# Antigravity #
+prompt_install "instalar Antigravity" sudo apt install antigravity -y
+
+# OpenCode (CLI y Desktop) #
+echo ""
+read -p "${YELLOW}¿Deseas instalar OpenCode (CLI y Desktop)? (Y/y = sí, N/n = no):${NC} " response_opencode
+if [[ "$response_opencode" == "Y" || "$response_opencode" == "y" ]]; then
+  printf "%b\n" "${GREEN}✓ Instalando OpenCode CLI...${NC}"
+  curl -fsSL https://opencode.ai/v2/install | bash
+  printf "%b\n" "${GREEN}✓ Instalando OpenCode Desktop...${NC}"
+  wget https://opencode.ai/files/bin/2.0.6/opencode-desktop-linux-amd64.deb -O opencode-desktop.deb
+  chmod +x opencode-desktop.deb
+  sudo apt install ./opencode-desktop.deb -y
+  rm -f opencode-desktop.deb
+else
+  printf "%b\n" "${RED}✗ Saltado${NC}"
+fi
+
+# ==========================================================
+# 3. NAVEGADORES WEB
+# ==========================================================
+print_section "Navegadores Web"
 
 # Brave Browser #
 echo ""
@@ -95,6 +130,16 @@ else
   printf "%b\n" "${RED}✗ Saltado${NC}"
 fi
 
+prompt_install "instalar Vivaldi" flatpak install -y flathub com.vivaldi.Vivaldi
+prompt_install "instalar Zen Browser" flatpak install -y flathub app.zen_browser.zen
+
+# ==========================================================
+# 4. COMUNICACIÓN & SOCIAL
+# ==========================================================
+print_section "Comunicación & Social"
+
+prompt_install "instalar Discord" flatpak install -y flathub com.discordapp.Discord
+
 # Vencord #
 echo ""
 read -p "${YELLOW}¿Deseas instalar Vencord? (Y/y = sí, N/n = no):${NC} " response_vencord
@@ -104,6 +149,15 @@ if [[ "$response_vencord" == "Y" || "$response_vencord" == "y" ]]; then
 else
   printf "%b\n" "${RED}✗ Saltado${NC}"
 fi
+
+prompt_install "instalar Teams for Linux" flatpak install -y flathub com.github.IsmaelMartinez.teams_for_linux
+
+# ==========================================================
+# 5. MULTIMEDIA, JUEGOS & IA
+# ==========================================================
+print_section "Multimedia, Juegos & IA"
+
+prompt_install "instalar Spotify" flatpak install -y flathub com.spotify.Client
 
 # Spicetify #
 echo ""
@@ -122,6 +176,10 @@ else
   printf "%b\n" "${RED}✗ Saltado${NC}"
 fi
 
+prompt_install "instalar OBS Studio" flatpak install -y flathub com.obsproject.Studio
+prompt_install "instalar Pinta (edición de imágenes)" flatpak install flathub com.github.PintaProject.Pinta -y
+prompt_install "instalar Draw.io" flatpak install -y flathub com.jgraph.drawio.desktop
+
 # LM Studio #
 echo ""
 read -p "${YELLOW}¿Deseas instalar LM Studio? (Y/y = sí, N/n = no):${NC} " response_lmstudio
@@ -132,25 +190,13 @@ else
   printf "%b\n" "${RED}✗ Saltado${NC}"
 fi
 
+prompt_install "instalar Steam" sudo apt install steam -y
 
-# Visual studio code
-echo ""
-read -p "${YELLOW}¿Deseas instalar Visual Studio Code? (Y/y = sí, N/n = no):${NC} " response_vscode
-if [[ "$response_vscode" == "Y" || "$response_vscode" == "y" ]]; then
-  printf "%b\n" "${GREEN}✓ Instalando...${NC}"
-  wget 'https://go.microsoft.com/fwlink/?LinkID=760868' -O vscode.deb
-  chmod +x vscode.deb
-  sudo apt install ./vscode.deb -y
-  rm -f vscode.deb
-else
-  printf "%b\n" "${RED}✗ Saltado${NC}"
-fi
-
-# Descargar e instalar TLauncher #
+# TLauncher #
 echo ""
 read -p "${YELLOW}¿Deseas instalar TLauncher? (Y/y = sí, N/n = no):${NC} " response_tlauncher
 if [[ "$response_tlauncher" == "Y" || "$response_tlauncher" == "y" ]]; then
-  printf "%b\n" "${GREEN}✓ Instalando...${NC}"
+  printf "%b\n" "${GREEN}✓ Instalando TLauncher...${NC}"
   wget https://tlauncher.org/installer-linux -O tlauncher.deb
   chmod +x tlauncher.deb
   sudo apt install ./tlauncher.deb -y
@@ -159,11 +205,16 @@ else
   printf "%b\n" "${RED}✗ Saltado${NC}"
 fi
 
-# OnlyOffice
+# ==========================================================
+# 6. OFIMÁTICA & HERRAMIENTAS
+# ==========================================================
+print_section "Ofimática & Herramientas"
+
+# OnlyOffice #
 echo ""
 read -p "${YELLOW}¿Deseas instalar OnlyOffice? (Y/y = sí, N/n = no):${NC} " response_onlyoffice
 if [[ "$response_onlyoffice" == "Y" || "$response_onlyoffice" == "y" ]]; then
-  printf "%b\n" "${GREEN}✓ Instalando...${NC}"
+  printf "%b\n" "${GREEN}✓ Instalando OnlyOffice...${NC}"
   wget https://download.onlyoffice.com/install/desktop/editors/linux/onlyoffice-desktopeditors_amd64.deb
   chmod +x onlyoffice-desktopeditors_amd64.deb
   sudo apt install ./onlyoffice-desktopeditors_amd64.deb -y
@@ -172,48 +223,24 @@ else
   printf "%b\n" "${RED}✗ Saltado${NC}"
 fi
 
-# Antigravity
-echo ""
-read -p "${YELLOW}¿Deseas instalar Antigravity? (Y/y = sí, N/n = no):${NC} " response_antigravity
-if [[ "$response_antigravity" == "Y" || "$response_antigravity" == "y" ]]; then
-  printf "%b\n" "${GREEN}✓ Instalando...${NC}"
-  sudo mkdir -p /etc/apt/keyrings
-  curl -fsSL https://us-central1-apt.pkg.dev/doc/repo-signing-key.gpg | sudo gpg --dearmor --yes -o /etc/apt/keyrings/antigravity-repo-key.gpg
-  echo "deb [signed-by=/etc/apt/keyrings/antigravity-repo-key.gpg] https://us-central1-apt.pkg.dev/projects/antigravity-auto-updater-dev/ antigravity-debian main" | sudo tee /etc/apt/sources.list.d/antigravity.list > /dev/null
-  sudo apt update
-  sudo apt install antigravity -y
-else
-  printf "%b\n" "${RED}✗ Saltado${NC}"
-fi
+prompt_install "instalar Mousepad" sudo apt install mousepad -y
+prompt_install "instalar Filezilla" sudo apt install filezilla -y
+prompt_install "instalar Github Desktop" flatpak install -y flathub io.github.shiftey.Desktop
 
-# OpenCode (CLI y Desktop)
-echo ""
-read -p "${YELLOW}¿Deseas instalar OpenCode (CLI y Desktop)? (Y/y = sí, N/n = no):${NC} " response_opencode
-if [[ "$response_opencode" == "Y" || "$response_opencode" == "y" ]]; then
-  printf "%b\n" "${GREEN}✓ Instalando OpenCode CLI...${NC}"
-  curl -fsSL https://opencode.ai/v2/install | bash
-  printf "%b\n" "${GREEN}✓ Instalando OpenCode Desktop...${NC}"
-  wget https://opencode.ai/files/bin/2.0.6/opencode-desktop-linux-amd64.deb -O opencode-desktop.deb
-  chmod +x opencode-desktop.deb
-  sudo apt install ./opencode-desktop.deb -y
-  rm -f opencode-desktop.deb
-else
-  printf "%b\n" "${RED}✗ Saltado${NC}"
-fi
+# ==========================================================
+# 7. PERSONALIZACIÓN & ENTORNO (KDE)
+# ==========================================================
+print_section "Personalización (Wallpaper Engine con KDE)"
 
-
-# Terminal Warp
-# wget -O warp.deb "https://app.warp.dev/download?package=deb" && sudo dpkg -i warp.deb && sudo apt -f install -y
-# rm -f warp.deb
-
-# WallPaper Engine
-printf "%b\n" "\n${YELLOW}--- Configurar Wallpaper Engine con KDE ---${NC}"
+printf "%b\n" "${YELLOW}Guía de configuración:${NC}"
 echo "1. Instalar Wallpaper Engine: Desde Steam"
 echo "2. Instalar Waywallen: Darle click derecho al fondo de pantalla > Escritorio e imagen de fondo > Obtener nuevos complementos > Waywallen"
 echo "3. Descargar Plugin: https://github.com/waywallen/open-wallpaper-engine/releases > Descargar org x86 > no descomprimir"
 echo "4. Instalar Plugin: Abrir Waywallen > Plugins > Añadir > Seleccionar el zip"
 echo "5. Configurar ruta de Steam: Abrir Waywallen > Library Manager > Añadir con wallpaper > Insertar ruta ~/.steam/steam/steamapps/"
 echo "6. Habilitar fondo de pantalla: Darle click derecho al fondo de pantalla > Escritorio e imagen de fondo > Tipo de fondo: Waywallen"
+
+echo ""
 read -p "${YELLOW}¿Deseas abrir el link del tutorial de Wallpaper Engine en el navegador? (Y/y = sí, N/n = no):${NC} " response_wallpaper
 if [[ "$response_wallpaper" == "Y" || "$response_wallpaper" == "y" ]]; then
   printf "%b\n" "${GREEN}✓ Abriendo navegador...${NC}"
@@ -222,10 +249,14 @@ else
   printf "%b\n" "${RED}✗ Saltado${NC}"
 fi
 
-# Desisntalar software innecesario #
-prompt_install "desinstalar LibreOffice" sudo apt-get remove --purge libreoffice*
+# ==========================================================
+# 8. LIMPIEZA & OPTIMIZACIÓN
+# ==========================================================
+print_section "Limpieza y Optimización del Sistema"
+
+prompt_install "desinstalar LibreOffice" sudo apt-get remove --purge libreoffice* -y
 prompt_install "limpiar caché de apt (apt clean)" sudo apt clean
-prompt_install "desinstalar paquetes innecesarios (apt autoremove)" sudo apt-get autoremove
+prompt_install "desinstalar paquetes innecesarios (apt autoremove)" sudo apt-get autoremove -y
 
 printf "%b\n" "\n${CYAN}==========================================================${NC}"
 printf "%b\n" "${GREEN}✓ ¡INSTALACIONES FINALIZADAS!${NC}"

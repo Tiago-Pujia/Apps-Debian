@@ -21,7 +21,7 @@ Un script interactivo en Bash diseñado para automatizar la configuración inici
 - **Node.js (LTS) & npm**: Entorno de ejecución JavaScript vía NodeSource.
 - **Docker & Docker Compose**: Plataforma de contenedores oficial (con asignación de grupo al usuario).
 - **OpenCode (CLI & Desktop)**: Editor y herramientas asistidas por IA.
-- **Antigravity IDE & CLI**: Entorno de desarrollo de IA de Antigravity.
+- **Antigravity**: Instalación directa mediante paquete apt (`sudo apt install antigravity`).
 - **Visual Studio Code**: Editor de código fuente oficial de Microsoft.
 - **Postman**: Plataforma de pruebas API (vía Snap).
 - **JQ**: Procesador JSON para línea de comandos.
