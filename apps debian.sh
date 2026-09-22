@@ -105,6 +105,23 @@ else
   printf "%b\n" "${RED}✗ Saltado${NC}"
 fi
 
+# Spicetify #
+echo ""
+read -p "${YELLOW}¿Deseas instalar Spicetify (CLI & Marketplace para Spotify)? (Y/y = sí, N/n = no):${NC} " response_spicetify
+if [[ "$response_spicetify" == "Y" || "$response_spicetify" == "y" ]]; then
+  printf "%b\n" "${GREEN}✓ Instalando Spicetify CLI...${NC}"
+  curl -fsSL https://raw.githubusercontent.com/spicetify/cli/main/install.sh | sh
+  printf "%b\n" "${GREEN}✓ Instalando Spicetify Marketplace...${NC}"
+  curl -fsSL https://raw.githubusercontent.com/spicetify/marketplace/main/resources/install.sh | sh
+  if [ -d "/var/lib/flatpak/app/com.spotify.Client" ]; then
+    printf "%b\n" "${GREEN}✓ Ajustando permisos para Spotify Flatpak...${NC}"
+    sudo chmod a+wr /var/lib/flatpak/app/com.spotify.Client/x86_64/stable/active/files/extra/share/spotify 2>/dev/null
+    sudo chmod a+wr /var/lib/flatpak/app/com.spotify.Client/x86_64/stable/active/files/extra/share/spotify/apps -R 2>/dev/null
+  fi
+else
+  printf "%b\n" "${RED}✗ Saltado${NC}"
+fi
+
 # LM Studio #
 echo ""
 read -p "${YELLOW}¿Deseas instalar LM Studio? (Y/y = sí, N/n = no):${NC} " response_lmstudio

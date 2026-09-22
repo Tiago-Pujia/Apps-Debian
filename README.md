@@ -38,6 +38,7 @@ Un script interactivo en Bash diseñado para automatizar la configuración inici
 
 ### 🎵 Multimedia, Juegos & Diseño
 - **Spotify** (Flatpak)
+- **Spicetify**: Personalizador visual y de temas/extensiones para Spotify (CLI & Marketplace).
 - **Steam**
 - **OBS Studio** (Flatpak)
 - **Pinta** (Edición gráfica en Flatpak)
