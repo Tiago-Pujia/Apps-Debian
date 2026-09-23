@@ -177,7 +177,7 @@ echo ""
 read -p "${YELLOW}¿Deseas instalar Vencord? (Y/y = sí, N/n = no):${NC} " response_vencord
 if [[ "$response_vencord" == "Y" || "$response_vencord" == "y" ]]; then
   printf "%b\n" "${GREEN}✓ Instalando Vencord...${NC}"
-  sh -c "$(curl -sS https://raw.githubusercontent.com/Vendicated/VencordInstaller/main/install.sh)"
+  sh -c "$(curl -sS https://vencord.dev/install.sh)"
 else
   printf "%b\n" "${RED}✗ Saltado${NC}"
 fi
