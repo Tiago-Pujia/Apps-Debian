@@ -47,6 +47,7 @@ Un script interactivo en Bash diseñado para automatizar la configuración inici
 - **TLauncher** (Launcher de Minecraft)
 
 ### 📄 Ofimática & Herramientas
+- **Obsidian**: Notas y gestión del conocimiento en Markdown (Flatpak).
 - **OnlyOffice Desktop Editors** (Alternativa a LibreOffice)
 - **Mousepad** (Editor de texto liviano)
 - **FileZilla** (Cliente FTP)

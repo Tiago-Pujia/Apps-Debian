@@ -255,6 +255,7 @@ else
   printf "%b\n" "${RED}✗ Saltado${NC}"
 fi
 
+prompt_install "instalar Obsidian" flatpak install -y flathub md.obsidian.Obsidian
 prompt_install "instalar Mousepad" sudo apt install mousepad -y
 prompt_install "instalar Filezilla" sudo apt install filezilla -y
 prompt_install "instalar Github Desktop" flatpak install -y flathub io.github.shiftey.Desktop
