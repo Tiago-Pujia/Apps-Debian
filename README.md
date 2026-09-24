@@ -17,6 +17,7 @@ Un script interactivo en Bash diseñado para automatizar la configuración inici
 
 ### 🔧 Desarrollo & Terminal
 - **Java (OpenJDK 17)**: Kit de desarrollo Java.
+- **.NET SDK (`dotnet`)**: Entorno de desarrollo para .NET.
 - **Git & GitHub CLI (`gh`)**: Control de versiones e integración con GitHub.
 - **Node.js (LTS) & npm**: Entorno de ejecución JavaScript vía NodeSource.
 - **Docker & Docker Compose**: Plataforma de contenedores oficial (con asignación de grupo al usuario).

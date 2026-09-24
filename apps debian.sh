@@ -53,6 +53,7 @@ prompt_install "instalar Fastfetch" sudo apt install fastfetch -y
 print_section "Desarrollo & Terminal"
 
 prompt_install "instalar Java (OpenJDK 17)" sudo apt install openjdk-17-jdk -y
+prompt_install "instalar .NET SDK (dotnet)" sudo apt install dotnet-sdk-8.0 -y
 prompt_install "instalar Git" sudo apt install git -y
 prompt_install "instalar GitHub CLI (gh)" sudo apt install gh -y
 prompt_install "instalar JQ (procesador JSON)" sudo apt install jq -y
