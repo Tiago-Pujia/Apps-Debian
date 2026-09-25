@@ -157,6 +157,68 @@ install_brave() {
 
 install_vencord() {
   sh -c "$(curl -sS https://vencord.dev/install.sh)"
+
+  local themes_dir="$HOME/.var/app/com.discordapp.Discord/config/Vencord/themes"
+  mkdir -p "$themes_dir"
+
+  printf "%b\n" "${GREEN}✓ Descargando temas para Vencord...${NC}"
+  if curl -fsSL "https://drive.google.com/uc?export=download&id=1JmvCy4Yh-L6t1_pyVrMdowZNHvaIe1iW" -o "$themes_dir/Transparent.theme.css" && \
+     curl -fsSL "https://betterdiscord.app/download?id=40" -o "$themes_dir/FrostedGlass.theme.css"; then
+    printf "%b\n" "${GREEN}✓ Temas instalados correctamente en $themes_dir${NC}"
+  else
+    printf "%b\n" "${YELLOW}⚠ Ocurrió un problema al descargar los temas para Vencord.${NC}"
+  fi
+}
+
+configure_spotify_kde_transparency() {
+  printf "%b\n" "${GREEN}✓ Configurando regla de transparencia (90%) para Spotify en KDE Plasma...${NC}"
+  python3 -c '
+import configparser, os, uuid
+
+path = os.path.expanduser("~/.config/kwinrulesrc")
+os.makedirs(os.path.dirname(path), exist_ok=True)
+config = configparser.RawConfigParser()
+config.optionxform = str
+
+if os.path.exists(path):
+    config.read(path, encoding="utf-8")
+
+target_sec = None
+for sec in config.sections():
+    if sec != "General":
+        if (config.has_option(sec, "wmclass") and "spotify" in config.get(sec, "wmclass").lower()) or \
+           (config.has_option(sec, "Description") and "spotify" in config.get(sec, "Description").lower()):
+            target_sec = sec
+            break
+
+if not target_sec:
+    target_sec = str(uuid.uuid4())
+    config.add_section(target_sec)
+    config.set(target_sec, "Description", "Spotify Transparente")
+    config.set(target_sec, "wmclass", "spotify")
+    config.set(target_sec, "wmclassmatch", "1")
+    
+    if not config.has_section("General"):
+        config.add_section("General")
+    
+    current_rules = config.get("General", "rules", fallback="").strip()
+    rule_list = [r.strip() for r in current_rules.split(",") if r.strip()]
+    if target_sec not in rule_list:
+        rule_list.append(target_sec)
+    config.set("General", "rules", ",".join(rule_list))
+    config.set("General", "count", str(len(rule_list)))
+
+config.set(target_sec, "opacityactive", "90")
+config.set(target_sec, "opacityactiverule", "2")
+config.set(target_sec, "opacityinactive", "90")
+config.set(target_sec, "opacityinactiverule", "2")
+
+with open(path, "w", encoding="utf-8") as f:
+    config.write(f)
+' 2>/dev/null || true
+
+  dbus-send --session --dest=org.kde.KWin /KWin org.kde.KWin.reconfigure 2>/dev/null || \
+  qdbus org.kde.KWin /KWin reconfigure 2>/dev/null || true
 }
 
 install_spicetify() {
@@ -197,7 +259,10 @@ install_spicetify() {
   else
     printf "%b\n" "${YELLOW}⚠ Nota: No se detectó Spotify instalado mediante Flatpak. Si usas Spotify de apt/snap, Spicetify se configurará automáticamente al ejecutarlo.${NC}"
   fi
+
+  configure_spotify_kde_transparency
 }
+
 
 install_lmstudio() {
   curl -fsSL https://lmstudio.ai/install.sh | bash
