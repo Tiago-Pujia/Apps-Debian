@@ -157,6 +157,17 @@ install_brave() {
 
 install_vencord() {
   sh -c "$(curl -sS https://vencord.dev/install.sh)"
+
+  local themes_dir="$HOME/.var/app/com.discordapp.Discord/config/Vencord/themes"
+  mkdir -p "$themes_dir"
+
+  printf "%b\n" "${GREEN}✓ Descargando temas para Vencord...${NC}"
+  if curl -fsSL "https://drive.google.com/uc?export=download&id=1JmvCy4Yh-L6t1_pyVrMdowZNHvaIe1iW" -o "$themes_dir/Transparent.theme.css" && \
+     curl -fsSL "https://betterdiscord.app/download?id=40" -o "$themes_dir/FrostedGlass.theme.css"; then
+    printf "%b\n" "${GREEN}✓ Temas instalados correctamente en $themes_dir${NC}"
+  else
+    printf "%b\n" "${YELLOW}⚠ Ocurrió un problema al descargar los temas para Vencord.${NC}"
+  fi
 }
 
 install_spicetify() {
