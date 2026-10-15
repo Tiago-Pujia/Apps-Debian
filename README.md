@@ -18,6 +18,8 @@ Un script interactivo en Bash diseñado para automatizar la configuración inici
 - **Postman**
 - **JQ**
 - **Vim, Htop, Btop**
+- **GitHub Desktop**
+- **LM Studio**
 
 ### 🌐 Navegadores Web
 - **Brave Browser**
@@ -32,17 +34,15 @@ Un script interactivo en Bash diseñado para automatizar la configuración inici
 - **Spotify** + **Spicetify**
 - **Steam**
 - **OBS Studio**
-- **Pinta**
 - **Draw.io**
-- **LM Studio**
 - **TLauncher**
 
 ### 📄 Ofimática & Herramientas
-- **Obsidian**
+- **ArtCraft (Craft Launcher)**
 - **OnlyOffice Desktop Editors**
+- **Obsidian**
 - **Mousepad**
 - **FileZilla**
-- **GitHub Desktop**
 
 ---
 

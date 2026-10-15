@@ -306,6 +306,32 @@ EOF
   fi
 }
 
+install_artcraft() {
+  printf "%b\n" "${GREEN}✓ Obteniendo la última versión de ArtCraft Launcher...${NC}"
+  local tag version arch url
+  tag=$(curl -sI https://github.com/storytold/craft-launcher/releases/latest 2>/dev/null | grep -i "^location:" | head -n 1 | tr -d '\r' | awk -F'/' '{print $NF}')
+  if [[ ! "$tag" =~ ^v[0-9] ]]; then
+    tag="v0.4.1"
+  fi
+  version="${tag#v}"
+  arch=$(uname -m)
+  if [ "$arch" != "x86_64" ] && [ "$arch" != "aarch64" ]; then
+    arch="x86_64"
+  fi
+
+  url="https://github.com/storytold/craft-launcher/releases/download/${tag}/artcraft-launcher-${version}-linux-${arch}.deb"
+  printf "%b\n" "${GREEN}✓ Descargando ArtCraft Launcher (${version} - ${arch})...${NC}"
+  if wget "$url" -O /tmp/artcraft-launcher.deb; then
+    chmod +x /tmp/artcraft-launcher.deb
+    sudo apt install /tmp/artcraft-launcher.deb -y
+    rm -f /tmp/artcraft-launcher.deb
+    printf "%b\n" "${GREEN}✓ ArtCraft Launcher instalado correctamente.${NC}"
+  else
+    printf "%b\n" "${RED}✗ Error al descargar ArtCraft Launcher desde $url${NC}"
+    rm -f /tmp/artcraft-launcher.deb
+  fi
+}
+
 install_onlyoffice() {
   wget https://download.onlyoffice.com/install/desktop/editors/linux/onlyoffice-desktopeditors_amd64.deb -O /tmp/onlyoffice.deb
   chmod +x /tmp/onlyoffice.deb
@@ -347,6 +373,8 @@ prompt_install "instalar Docker y Docker Compose" install_docker
 prompt_install "instalar Visual Studio Code" install_vscode
 prompt_install "instalar Antigravity" install_antigravity
 prompt_install "instalar OpenCode (CLI y Desktop)" install_opencode
+prompt_install "instalar Github Desktop" flatpak install -y flathub io.github.shiftey.Desktop
+prompt_install "instalar LM Studio" install_lmstudio
 
 # ==========================================================
 # 3. NAVEGADORES WEB
@@ -374,9 +402,7 @@ print_section "Multimedia, Juegos & IA"
 prompt_install "instalar Spotify" flatpak install -y flathub com.spotify.Client
 prompt_install "instalar Spicetify (CLI & Marketplace para Spotify)" install_spicetify
 prompt_install "instalar OBS Studio" flatpak install -y flathub com.obsproject.Studio
-prompt_install "instalar Pinta (edición de imágenes)" flatpak install flathub com.github.PintaProject.Pinta -y
 prompt_install "instalar Draw.io" flatpak install -y flathub com.jgraph.drawio.desktop
-prompt_install "instalar LM Studio" install_lmstudio
 prompt_install "instalar Steam" sudo apt install steam -y
 prompt_install "instalar TLauncher" install_tlauncher
 
@@ -385,11 +411,11 @@ prompt_install "instalar TLauncher" install_tlauncher
 # ==========================================================
 print_section "Ofimática & Herramientas"
 
-prompt_install "instalar OnlyOffice" install_onlyoffice
+prompt_install "instalar ArtCraft (Launcher de herramientas open source de Abode y Microsoft)" install_artcraft
+prompt_install "instalar OnlyOffice (Herramientas open source de Microsoft)" install_onlyoffice
 prompt_install "instalar Obsidian" flatpak install -y flathub md.obsidian.Obsidian
 prompt_install "instalar Mousepad" sudo apt install mousepad -y
 prompt_install "instalar Filezilla" sudo apt install filezilla -y
-prompt_install "instalar Github Desktop" flatpak install -y flathub io.github.shiftey.Desktop
 
 # ==========================================================
 # 7. PERSONALIZACIÓN & ENTORNO (KDE)
