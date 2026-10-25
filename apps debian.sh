@@ -416,6 +416,7 @@ prompt_install "instalar OnlyOffice (Herramientas open source de Microsoft)" ins
 prompt_install "instalar Obsidian" flatpak install -y flathub md.obsidian.Obsidian
 prompt_install "instalar Mousepad" sudo apt install mousepad -y
 prompt_install "instalar Filezilla" sudo apt install filezilla -y
+prompt_install "instalar PeaZip" flatpak install -y flathub io.github.peazip.PeaZip
 
 # ==========================================================
 # 7. PERSONALIZACIÓN & ENTORNO (KDE)

@@ -43,6 +43,7 @@ Un script interactivo en Bash diseñado para automatizar la configuración inici
 - **Obsidian**
 - **Mousepad**
 - **FileZilla**
+- **PeaZip**
 
 ---
 
