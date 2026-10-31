@@ -339,6 +339,52 @@ install_onlyoffice() {
   rm -f /tmp/onlyoffice.deb
 }
 
+install_gdsync() {
+  printf "%b\n" "${GREEN}✓ Verificando e instalando dependencias (FUSE3 y Python3-PyQt6)...${NC}"
+  sudo apt install -y fuse3 python3-pyqt6
+
+  printf "%b\n" "${GREEN}✓ Obteniendo la última versión precompilada de gdsync...${NC}"
+  local tag arch url temp_dir
+  tag=$(curl -sI https://github.com/Tiago-Pujia/gdsync/releases/latest 2>/dev/null | grep -i "^location:" | head -n 1 | tr -d '\r' | awk -F'/' '{print $NF}')
+  if [[ ! "$tag" =~ ^v[0-9] ]]; then
+    tag="v0.1.0"
+  fi
+
+  arch=$(uname -m)
+  if [ "$arch" != "x86_64" ] && [ "$arch" != "aarch64" ]; then
+    arch="x86_64"
+  fi
+
+  url="https://github.com/Tiago-Pujia/gdsync/releases/download/${tag}/gdsync-${tag}-linux-${arch}.tar.gz"
+  temp_dir="/tmp/gdsync_extracted"
+  rm -rf "$temp_dir" /tmp/gdsync.tar.gz
+  mkdir -p "$temp_dir"
+
+  printf "%b\n" "${GREEN}✓ Descargando gdsync (${tag} - ${arch})...${NC}"
+  if wget -q --show-progress "$url" -O /tmp/gdsync.tar.gz; then
+    tar -xzf /tmp/gdsync.tar.gz -C "$temp_dir" --strip-components=1
+    (
+      cd "$temp_dir" || exit 1
+      chmod +x install.sh
+      ./install.sh
+    )
+    rm -rf "$temp_dir" /tmp/gdsync.tar.gz
+
+    if [[ ":$PATH:" != *":$HOME/.local/bin:"* ]]; then
+      export PATH="$HOME/.local/bin:$PATH"
+      if ! grep -q '\$HOME/\.local/bin' ~/.bashrc 2>/dev/null && ! grep -q "$HOME/.local/bin" ~/.bashrc 2>/dev/null; then
+        echo 'export PATH="$HOME/.local/bin:$PATH"' >> ~/.bashrc
+      fi
+    fi
+
+    printf "%b\n" "${GREEN}✓ gdsync instalado y configurado correctamente.${NC}"
+  else
+    printf "%b\n" "${RED}✗ Error al descargar gdsync desde $url${NC}"
+    rm -rf "$temp_dir" /tmp/gdsync.tar.gz
+  fi
+}
+
+
 open_wallpaper_tutorial() {
   xdg-open "https://youtu.be/4ZAeVub9a2I?si=pEChx449ZNi3M3bD&t=549" 2>/dev/null || printf "%b\n" "${RED}⚠ No se pudo abrir el navegador automáticamente. Abre el link manualmente: https://youtu.be/4ZAeVub9a2I?si=pEChx449ZNi3M3bD&t=549${NC}"
 }
@@ -417,6 +463,7 @@ prompt_install "instalar Obsidian" flatpak install -y flathub md.obsidian.Obsidi
 prompt_install "instalar Mousepad" sudo apt install mousepad -y
 prompt_install "instalar Filezilla" sudo apt install filezilla -y
 prompt_install "instalar PeaZip" flatpak install -y flathub io.github.peazip.PeaZip
+prompt_install "instalar gdsync (Cliente Google Drive para Linux con soporte Dolphin/KDE)" install_gdsync
 
 # ==========================================================
 # 7. PERSONALIZACIÓN & ENTORNO (KDE)

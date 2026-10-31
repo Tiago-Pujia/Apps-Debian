@@ -44,6 +44,7 @@ Un script interactivo en Bash diseñado para automatizar la configuración inici
 - **Mousepad**
 - **FileZilla**
 - **PeaZip**
+- **gdsync (Google Drive para Linux con soporte Dolphin/KDE)**
 
 ---
 
