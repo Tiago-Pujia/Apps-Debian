@@ -501,6 +501,7 @@ print_section "Ofimática & Herramientas"
 prompt_install "instalar ArtCraft (Launcher de herramientas open source de Abode y Microsoft)" install_artcraft
 prompt_install "instalar OnlyOffice (Herramientas open source de Microsoft)" install_onlyoffice
 prompt_install "instalar Obsidian" flatpak install -y flathub md.obsidian.Obsidian
+prompt_install "instalar MarkText" flatpak install -y flathub com.github.marktext.marktext
 prompt_install "instalar Mousepad" sudo apt install mousepad -y
 prompt_install "instalar Filezilla" sudo apt install filezilla -y
 prompt_install "instalar PeaZip" flatpak install -y flathub io.github.peazip.PeaZip

@@ -42,6 +42,7 @@ Un script interactivo en Bash diseñado para automatizar la configuración inici
 - **ArtCraft (Craft Launcher)**
 - **OnlyOffice Desktop Editors**
 - **Obsidian**
+- **MarkText**
 - **Mousepad**
 - **FileZilla**
 - **PeaZip**
