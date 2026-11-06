@@ -14,6 +14,7 @@ Un script interactivo en Bash diseñado para automatizar la configuración inici
 - **Docker & Docker Compose**
 - **OpenCode (CLI & Desktop)**
 - **Antigravity**
+- **agychat (Antigravity Chat Manager - CLI para duplicar, exportar e importar chats)**
 - **Visual Studio Code**
 - **Postman**
 - **JQ**

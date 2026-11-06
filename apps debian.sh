@@ -141,6 +141,52 @@ EOF
   printf "%b\n" "${GREEN}✓ Antigravity instalado y configurado correctamente.${NC}"
 }
 
+install_agychat() {
+  printf "%b\n" "${GREEN}✓ Instalando agychat (Antigravity Chat Manager)...${NC}"
+  sudo apt install -y python3 git
+
+  local target_dir="/opt/agychat"
+  if [ -d "$target_dir/.git" ]; then
+    printf "%b\n" "${GREEN}✓ Actualizando repositorio existente de agychat...${NC}"
+    sudo git -C "$target_dir" pull --quiet || true
+  else
+    sudo rm -rf "$target_dir"
+    if ! sudo git clone --quiet https://github.com/Tiago-Pujia/agychat.git "$target_dir" 2>/dev/null; then
+      printf "%b\n" "${YELLOW}⚠ Falló git clone. Descargando repositorio desde GitHub...${NC}"
+      local temp_dir="/tmp/agychat_temp"
+      rm -rf "$temp_dir" /tmp/agychat.tar.gz
+      mkdir -p "$temp_dir"
+      wget -q https://github.com/Tiago-Pujia/agychat/archive/refs/heads/main.tar.gz -O /tmp/agychat.tar.gz
+      tar -xzf /tmp/agychat.tar.gz -C "$temp_dir" --strip-components=1
+      sudo mkdir -p "$target_dir"
+      sudo cp -r "$temp_dir"/* "$target_dir/"
+      rm -rf "$temp_dir" /tmp/agychat.tar.gz
+    fi
+  fi
+
+  sudo chmod +x "$target_dir/duplicate_chat.py" "$target_dir/install.sh" "$target_dir/uninstall.sh" 2>/dev/null || true
+
+  # Enlaces simbólicos globales en /usr/local/bin
+  sudo ln -sf "$target_dir/duplicate_chat.py" /usr/local/bin/agychat
+  sudo ln -sf "$target_dir/duplicate_chat.py" /usr/local/bin/antigravity-chat
+  sudo ln -sf "$target_dir/duplicate_chat.py" /usr/local/bin/duplicate-chat-antigravity
+
+  # Enlaces simbólicos en ~/.local/bin
+  mkdir -p "$HOME/.local/bin"
+  ln -sf "$target_dir/duplicate_chat.py" "$HOME/.local/bin/agychat"
+  ln -sf "$target_dir/duplicate_chat.py" "$HOME/.local/bin/antigravity-chat"
+  ln -sf "$target_dir/duplicate_chat.py" "$HOME/.local/bin/duplicate-chat-antigravity"
+
+  if [[ ":$PATH:" != *":$HOME/.local/bin:"* ]]; then
+    export PATH="$HOME/.local/bin:$PATH"
+    if ! grep -q '\$HOME/\.local/bin' ~/.bashrc 2>/dev/null && ! grep -q "$HOME/.local/bin" ~/.bashrc 2>/dev/null; then
+      echo 'export PATH="$HOME/.local/bin:$PATH"' >> ~/.bashrc
+    fi
+  fi
+
+  printf "%b\n" "${GREEN}✓ agychat instalado correctamente. Comandos disponibles: agychat, antigravity-chat, duplicate-chat-antigravity${NC}"
+}
+
 install_opencode() {
   printf "%b\n" "${GREEN}✓ Instalando OpenCode CLI...${NC}"
   curl -fsSL https://opencode.ai/v2/install | bash
@@ -418,6 +464,7 @@ prompt_install "instalar Node.js y npm (LTS)" install_nodejs
 prompt_install "instalar Docker y Docker Compose" install_docker
 prompt_install "instalar Visual Studio Code" install_vscode
 prompt_install "instalar Antigravity" install_antigravity
+prompt_install "instalar agychat (CLI para duplicar, exportar e importar chats en Antigravity)" install_agychat
 prompt_install "instalar OpenCode (CLI y Desktop)" install_opencode
 prompt_install "instalar Github Desktop" flatpak install -y flathub io.github.shiftey.Desktop
 prompt_install "instalar LM Studio" install_lmstudio
