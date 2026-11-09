@@ -510,6 +510,7 @@ prompt_install "instalar Obsidian" flatpak install -y flathub md.obsidian.Obsidi
 prompt_install "instalar Mousepad" sudo apt install mousepad -y
 prompt_install "instalar Filezilla" sudo apt install filezilla -y
 prompt_install "instalar PeaZip" flatpak install -y flathub io.github.peazip.PeaZip
+prompt_install "instalar KeePass2" sudo apt install keepass2 -y
 prompt_install "instalar gdsync (Cliente Google Drive para Linux con soporte Dolphin/KDE)" install_gdsync
 
 # ==========================================================
