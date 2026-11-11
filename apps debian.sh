@@ -455,7 +455,6 @@ prompt_install "instalar Java (OpenJDK 17)" sudo apt install openjdk-17-jdk -y
 prompt_install "instalar .NET SDK (dotnet)" install_dotnet
 prompt_install "instalar Git" sudo apt install git -y
 prompt_install "instalar GitHub CLI (gh)" sudo apt install gh -y
-prompt_install "instalar JQ (procesador JSON)" sudo apt install jq -y
 prompt_install "instalar Vim" sudo apt install vim -y
 prompt_install "instalar Htop" sudo apt install htop -y
 prompt_install "instalar Btop" sudo apt install btop -y
@@ -506,12 +505,12 @@ print_section "Ofimática & Herramientas"
 
 prompt_install "instalar ArtCraft (Launcher de herramientas open source de Abode y Microsoft)" install_artcraft
 prompt_install "instalar OnlyOffice (Herramientas open source de Microsoft)" install_onlyoffice
-prompt_install "instalar Obsidian" flatpak install -y flathub md.obsidian.Obsidian
 prompt_install "instalar Mousepad" sudo apt install mousepad -y
 prompt_install "instalar Filezilla" sudo apt install filezilla -y
 prompt_install "instalar PeaZip" flatpak install -y flathub io.github.peazip.PeaZip
 prompt_install "instalar KeePass2" sudo apt install keepass2 -y
 prompt_install "instalar gdsync (Cliente Google Drive para Linux con soporte Dolphin/KDE)" install_gdsync
+prompt_install "instalar JDownloader" flatpak install -y flathub org.jdownloader.JDownloader
 
 # ==========================================================
 # 7. PERSONALIZACIÓN & ENTORNO (KDE)

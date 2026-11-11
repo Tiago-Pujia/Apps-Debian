@@ -17,7 +17,6 @@ Un script interactivo en Bash diseñado para automatizar la configuración inici
 - **agychat (Antigravity Chat Manager - CLI para duplicar, exportar e importar chats)**
 - **Visual Studio Code**
 - **Postman**
-- **JQ**
 - **Vim, Htop, Btop**
 - **GitHub Desktop**
 - **LM Studio**
@@ -41,12 +40,12 @@ Un script interactivo en Bash diseñado para automatizar la configuración inici
 ### 📄 Ofimática & Herramientas
 - **ArtCraft (Craft Launcher)**
 - **OnlyOffice Desktop Editors**
-- **Obsidian**
 - **Mousepad**
 - **FileZilla**
 - **PeaZip**
 - **KeePass2**
 - **gdsync (Google Drive para Linux con soporte Dolphin/KDE)**
+- **JDownloader**
 
 ---
 
