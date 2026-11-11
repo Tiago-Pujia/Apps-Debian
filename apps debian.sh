@@ -62,6 +62,92 @@ install_dotnet() {
   fi
 }
 
+install_powershell() {
+  printf "%b\n" "${GREEN}✓ Intentando instalar PowerShell vía apt...${NC}"
+  if sudo apt install powershell -y 2>/dev/null; then
+    printf "%b\n" "${GREEN}✓ PowerShell instalado correctamente mediante apt.${NC}"
+    return 0
+  fi
+
+  # Configurar repositorio oficial de Microsoft si está disponible para la distro
+  local distro version_id id_like
+  if [ -f /etc/os-release ]; then
+    distro=$(grep '^ID=' /etc/os-release | cut -d= -f2 | tr -d '"')
+    version_id=$(grep '^VERSION_ID=' /etc/os-release | cut -d= -f2 | tr -d '"')
+    id_like=$(grep '^ID_LIKE=' /etc/os-release | cut -d= -f2 | tr -d '"')
+  fi
+
+  if [ "$distro" != "ubuntu" ] && [ "$distro" != "debian" ]; then
+    if [[ "$id_like" =~ "ubuntu" ]]; then
+      distro="ubuntu"
+    elif [[ "$id_like" =~ "debian" ]]; then
+      distro="debian"
+    fi
+  fi
+
+  if [ -n "$distro" ] && [ -n "$version_id" ]; then
+    local repo_deb="https://packages.microsoft.com/config/${distro}/${version_id}/packages-microsoft-prod.deb"
+    if wget -q --spider "$repo_deb" 2>/dev/null; then
+      printf "%b\n" "${GREEN}✓ Configurando repositorio oficial de Microsoft para $distro $version_id...${NC}"
+      wget -q "$repo_deb" -O /tmp/packages-microsoft-prod.deb
+      sudo dpkg -i /tmp/packages-microsoft-prod.deb 2>/dev/null || true
+      rm -f /tmp/packages-microsoft-prod.deb
+      sudo apt update -y 2>/dev/null || true
+      if sudo apt install powershell -y 2>/dev/null; then
+        printf "%b\n" "${GREEN}✓ PowerShell instalado correctamente mediante el repositorio oficial de Microsoft.${NC}"
+        return 0
+      fi
+      # Si el repositorio de Microsoft no contiene el paquete para esta versión, limpiar la configuración del repo
+      sudo dpkg --purge packages-microsoft-prod 2>/dev/null || true
+      sudo rm -f /etc/apt/sources.list.d/microsoft-prod.list /etc/apt/sources.list.d/microsoft-prod.sources 2>/dev/null || true
+    fi
+  fi
+
+  # Si el repositorio no está disponible o apt falló, descargar .deb oficial de GitHub Releases
+  printf "%b\n" "${YELLOW}⚠ No se encontró powershell mediante repositorios apt. Descargando paquete .deb oficial de GitHub...${NC}"
+  local arch
+  arch=$(uname -m)
+  case "$arch" in
+    x86_64) arch="amd64" ;;
+    aarch64|arm64) arch="arm64" ;;
+    *) arch="amd64" ;;
+  esac
+
+  local deb_url
+  deb_url=$(curl -s https://api.github.com/repos/PowerShell/PowerShell/releases/latest 2>/dev/null | grep "browser_download_url" | grep "powershell_" | grep "${arch}\.deb" | head -n 1 | cut -d '"' -f 4)
+
+  if [ -z "$deb_url" ]; then
+    local tag
+    tag=$(curl -sI https://github.com/PowerShell/PowerShell/releases/latest 2>/dev/null | grep -i "^location:" | head -n 1 | tr -d '\r' | awk -F'/' '{print $NF}')
+    if [[ ! "$tag" =~ ^v[0-9] ]]; then
+      tag="v7.6.9"
+    fi
+    local version="${tag#v}"
+    deb_url="https://github.com/PowerShell/PowerShell/releases/download/${tag}/powershell_${version}-1.deb_${arch}.deb"
+  fi
+
+  printf "%b\n" "${GREEN}✓ Descargando PowerShell (.deb)...${NC}"
+  if wget "$deb_url" -O /tmp/powershell.deb; then
+    sudo apt install /tmp/powershell.deb -y
+    rm -f /tmp/powershell.deb
+    printf "%b\n" "${GREEN}✓ PowerShell instalado correctamente mediante paquete .deb.${NC}"
+    return 0
+  fi
+  rm -f /tmp/powershell.deb
+
+  # Fallback a Snap si está disponible
+  if command -v snap &>/dev/null; then
+    printf "%b\n" "${YELLOW}⚠ Intentando instalar PowerShell mediante Snap...${NC}"
+    if sudo snap install powershell --classic; then
+      printf "%b\n" "${GREEN}✓ PowerShell instalado correctamente mediante Snap.${NC}"
+      return 0
+    fi
+  fi
+
+  printf "%b\n" "${RED}✗ Error al instalar PowerShell.${NC}"
+  return 1
+}
+
 install_postman() {
   if command -v snap &>/dev/null; then
     sudo snap install postman
@@ -453,6 +539,7 @@ print_section "Desarrollo & Terminal"
 
 prompt_install "instalar Java (OpenJDK 17)" sudo apt install openjdk-17-jdk -y
 prompt_install "instalar .NET SDK (dotnet)" install_dotnet
+prompt_install "instalar PowerShell" install_powershell
 prompt_install "instalar Git" sudo apt install git -y
 prompt_install "instalar GitHub CLI (gh)" sudo apt install gh -y
 prompt_install "instalar Vim" sudo apt install vim -y
@@ -505,6 +592,7 @@ print_section "Ofimática & Herramientas"
 
 prompt_install "instalar ArtCraft (Launcher de herramientas open source de Abode y Microsoft)" install_artcraft
 prompt_install "instalar OnlyOffice (Herramientas open source de Microsoft)" install_onlyoffice
+prompt_install "instalar MarkText" flatpak install -y flathub com.github.marktext.marktext
 prompt_install "instalar Mousepad" sudo apt install mousepad -y
 prompt_install "instalar Filezilla" sudo apt install filezilla -y
 prompt_install "instalar PeaZip" flatpak install -y flathub io.github.peazip.PeaZip

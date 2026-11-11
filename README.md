@@ -9,6 +9,7 @@ Un script interactivo en Bash diseñado para automatizar la configuración inici
 ### 🔧 Desarrollo & Terminal
 - **Java (OpenJDK 17)**
 - **.NET SDK (`dotnet`)**
+- **PowerShell (`pwsh`)**
 - **Git & GitHub CLI (`gh`)**
 - **Node.js (LTS) & npm**
 - **Docker & Docker Compose**
@@ -40,6 +41,7 @@ Un script interactivo en Bash diseñado para automatizar la configuración inici
 ### 📄 Ofimática & Herramientas
 - **ArtCraft (Craft Launcher)**
 - **OnlyOffice Desktop Editors**
+- **MarkText**
 - **Mousepad**
 - **FileZilla**
 - **PeaZip**
