@@ -227,6 +227,52 @@ EOF
   printf "%b\n" "${GREEN}✓ Antigravity instalado y configurado correctamente.${NC}"
 }
 
+install_agychat() {
+  printf "%b\n" "${GREEN}✓ Instalando agychat (Antigravity Chat Manager)...${NC}"
+  sudo apt install -y python3 git
+
+  local target_dir="/opt/agychat"
+  if [ -d "$target_dir/.git" ]; then
+    printf "%b\n" "${GREEN}✓ Actualizando repositorio existente de agychat...${NC}"
+    sudo git -C "$target_dir" pull --quiet || true
+  else
+    sudo rm -rf "$target_dir"
+    if ! sudo git clone --quiet https://github.com/Tiago-Pujia/agychat.git "$target_dir" 2>/dev/null; then
+      printf "%b\n" "${YELLOW}⚠ Falló git clone. Descargando repositorio desde GitHub...${NC}"
+      local temp_dir="/tmp/agychat_temp"
+      rm -rf "$temp_dir" /tmp/agychat.tar.gz
+      mkdir -p "$temp_dir"
+      wget -q https://github.com/Tiago-Pujia/agychat/archive/refs/heads/main.tar.gz -O /tmp/agychat.tar.gz
+      tar -xzf /tmp/agychat.tar.gz -C "$temp_dir" --strip-components=1
+      sudo mkdir -p "$target_dir"
+      sudo cp -r "$temp_dir"/* "$target_dir/"
+      rm -rf "$temp_dir" /tmp/agychat.tar.gz
+    fi
+  fi
+
+  sudo chmod +x "$target_dir/duplicate_chat.py" "$target_dir/install.sh" "$target_dir/uninstall.sh" 2>/dev/null || true
+
+  # Enlaces simbólicos globales en /usr/local/bin
+  sudo ln -sf "$target_dir/duplicate_chat.py" /usr/local/bin/agychat
+  sudo ln -sf "$target_dir/duplicate_chat.py" /usr/local/bin/antigravity-chat
+  sudo ln -sf "$target_dir/duplicate_chat.py" /usr/local/bin/duplicate-chat-antigravity
+
+  # Enlaces simbólicos en ~/.local/bin
+  mkdir -p "$HOME/.local/bin"
+  ln -sf "$target_dir/duplicate_chat.py" "$HOME/.local/bin/agychat"
+  ln -sf "$target_dir/duplicate_chat.py" "$HOME/.local/bin/antigravity-chat"
+  ln -sf "$target_dir/duplicate_chat.py" "$HOME/.local/bin/duplicate-chat-antigravity"
+
+  if [[ ":$PATH:" != *":$HOME/.local/bin:"* ]]; then
+    export PATH="$HOME/.local/bin:$PATH"
+    if ! grep -q '\$HOME/\.local/bin' ~/.bashrc 2>/dev/null && ! grep -q "$HOME/.local/bin" ~/.bashrc 2>/dev/null; then
+      echo 'export PATH="$HOME/.local/bin:$PATH"' >> ~/.bashrc
+    fi
+  fi
+
+  printf "%b\n" "${GREEN}✓ agychat instalado correctamente. Comandos disponibles: agychat, antigravity-chat, duplicate-chat-antigravity${NC}"
+}
+
 install_opencode() {
   printf "%b\n" "${GREEN}✓ Instalando OpenCode CLI...${NC}"
   curl -fsSL https://opencode.ai/v2/install | bash
@@ -425,6 +471,52 @@ install_onlyoffice() {
   rm -f /tmp/onlyoffice.deb
 }
 
+install_gdsync() {
+  printf "%b\n" "${GREEN}✓ Verificando e instalando dependencias (FUSE3 y Python3-PyQt6)...${NC}"
+  sudo apt install -y fuse3 python3-pyqt6
+
+  printf "%b\n" "${GREEN}✓ Obteniendo la última versión precompilada de gdsync...${NC}"
+  local tag arch url temp_dir
+  tag=$(curl -sI https://github.com/Tiago-Pujia/gdsync/releases/latest 2>/dev/null | grep -i "^location:" | head -n 1 | tr -d '\r' | awk -F'/' '{print $NF}')
+  if [[ ! "$tag" =~ ^v[0-9] ]]; then
+    tag="v0.1.0"
+  fi
+
+  arch=$(uname -m)
+  if [ "$arch" != "x86_64" ] && [ "$arch" != "aarch64" ]; then
+    arch="x86_64"
+  fi
+
+  url="https://github.com/Tiago-Pujia/gdsync/releases/download/${tag}/gdsync-${tag}-linux-${arch}.tar.gz"
+  temp_dir="/tmp/gdsync_extracted"
+  rm -rf "$temp_dir" /tmp/gdsync.tar.gz
+  mkdir -p "$temp_dir"
+
+  printf "%b\n" "${GREEN}✓ Descargando gdsync (${tag} - ${arch})...${NC}"
+  if wget -q --show-progress "$url" -O /tmp/gdsync.tar.gz; then
+    tar -xzf /tmp/gdsync.tar.gz -C "$temp_dir" --strip-components=1
+    (
+      cd "$temp_dir" || exit 1
+      chmod +x install.sh
+      ./install.sh
+    )
+    rm -rf "$temp_dir" /tmp/gdsync.tar.gz
+
+    if [[ ":$PATH:" != *":$HOME/.local/bin:"* ]]; then
+      export PATH="$HOME/.local/bin:$PATH"
+      if ! grep -q '\$HOME/\.local/bin' ~/.bashrc 2>/dev/null && ! grep -q "$HOME/.local/bin" ~/.bashrc 2>/dev/null; then
+        echo 'export PATH="$HOME/.local/bin:$PATH"' >> ~/.bashrc
+      fi
+    fi
+
+    printf "%b\n" "${GREEN}✓ gdsync instalado y configurado correctamente.${NC}"
+  else
+    printf "%b\n" "${RED}✗ Error al descargar gdsync desde $url${NC}"
+    rm -rf "$temp_dir" /tmp/gdsync.tar.gz
+  fi
+}
+
+
 open_wallpaper_tutorial() {
   xdg-open "https://youtu.be/4ZAeVub9a2I?si=pEChx449ZNi3M3bD&t=549" 2>/dev/null || printf "%b\n" "${RED}⚠ No se pudo abrir el navegador automáticamente. Abre el link manualmente: https://youtu.be/4ZAeVub9a2I?si=pEChx449ZNi3M3bD&t=549${NC}"
 }
@@ -450,7 +542,6 @@ prompt_install "instalar .NET SDK (dotnet)" install_dotnet
 prompt_install "instalar PowerShell" install_powershell
 prompt_install "instalar Git" sudo apt install git -y
 prompt_install "instalar GitHub CLI (gh)" sudo apt install gh -y
-prompt_install "instalar JQ (procesador JSON)" sudo apt install jq -y
 prompt_install "instalar Vim" sudo apt install vim -y
 prompt_install "instalar Htop" sudo apt install htop -y
 prompt_install "instalar Btop" sudo apt install btop -y
@@ -459,6 +550,7 @@ prompt_install "instalar Node.js y npm (LTS)" install_nodejs
 prompt_install "instalar Docker y Docker Compose" install_docker
 prompt_install "instalar Visual Studio Code" install_vscode
 prompt_install "instalar Antigravity" install_antigravity
+prompt_install "instalar agychat (CLI para duplicar, exportar e importar chats en Antigravity)" install_agychat
 prompt_install "instalar OpenCode (CLI y Desktop)" install_opencode
 prompt_install "instalar Github Desktop" flatpak install -y flathub io.github.shiftey.Desktop
 prompt_install "instalar LM Studio" install_lmstudio
@@ -500,11 +592,13 @@ print_section "Ofimática & Herramientas"
 
 prompt_install "instalar ArtCraft (Launcher de herramientas open source de Abode y Microsoft)" install_artcraft
 prompt_install "instalar OnlyOffice (Herramientas open source de Microsoft)" install_onlyoffice
-prompt_install "instalar Obsidian" flatpak install -y flathub md.obsidian.Obsidian
 prompt_install "instalar MarkText" flatpak install -y flathub com.github.marktext.marktext
 prompt_install "instalar Mousepad" sudo apt install mousepad -y
 prompt_install "instalar Filezilla" sudo apt install filezilla -y
 prompt_install "instalar PeaZip" flatpak install -y flathub io.github.peazip.PeaZip
+prompt_install "instalar KeePass2" sudo apt install keepass2 -y
+prompt_install "instalar gdsync (Cliente Google Drive para Linux con soporte Dolphin/KDE)" install_gdsync
+prompt_install "instalar JDownloader" flatpak install -y flathub org.jdownloader.JDownloader
 
 # ==========================================================
 # 7. PERSONALIZACIÓN & ENTORNO (KDE)
