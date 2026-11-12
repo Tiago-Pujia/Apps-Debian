@@ -49,6 +49,9 @@ Un script interactivo en Bash diseñado para automatizar la configuración inici
 - **gdsync (Google Drive para Linux con soporte Dolphin/KDE)**
 - **JDownloader**
 
+### 🎨 Personalización & Entorno (KDE)
+- **Waywallen (Wallpaper Engine para KDE vía Flatpak + Plugin open-wallpaper-engine)**
+
 ---
 
 ## 🚀 Uso e Instalación
