@@ -517,6 +517,44 @@ install_gdsync() {
 }
 
 
+download_waywallen_plugin() {
+  local download_dir target_file tag version arch filename url
+  download_dir=$(xdg-user-dir DOWNLOAD 2>/dev/null)
+  if [ -z "$download_dir" ] || [ ! -d "$download_dir" ]; then
+    if [ -d "$HOME/Descargas" ]; then
+      download_dir="$HOME/Descargas"
+    elif [ -d "$HOME/Downloads" ]; then
+      download_dir="$HOME/Downloads"
+    else
+      download_dir="$HOME/Descargas"
+    fi
+  fi
+  mkdir -p "$download_dir"
+
+  printf "%b\n" "${GREEN}✓ Obteniendo la última versión del plugin open-wallpaper-engine...${NC}"
+  tag=$(curl -sI https://github.com/waywallen/open-wallpaper-engine/releases/latest 2>/dev/null | grep -i "^location:" | head -n 1 | tr -d '\r' | awk -F'/' '{print $NF}')
+  if [[ ! "$tag" =~ ^v[0-9] ]]; then
+    tag="v0.3.3"
+  fi
+  version="${tag#v}"
+
+  arch=$(uname -m)
+  if [ "$arch" != "x86_64" ] && [ "$arch" != "aarch64" ]; then
+    arch="x86_64"
+  fi
+
+  filename="org.waywallen.open-wallpaper-engine-${version}-linux-${arch}.zip"
+  target_file="$download_dir/$filename"
+  url="https://github.com/waywallen/open-wallpaper-engine/releases/download/${tag}/${filename}"
+
+  printf "%b\n" "${GREEN}✓ Descargando $filename en $download_dir con curl...${NC}"
+  if curl -# -fL "$url" -o "$target_file"; then
+    printf "%b\n" "${GREEN}✓ Plugin descargado correctamente en $target_file (no descomprimir).${NC}"
+  else
+    printf "%b\n" "${RED}✗ Error al descargar el plugin desde $url${NC}"
+  fi
+}
+
 open_wallpaper_tutorial() {
   xdg-open "https://youtu.be/4ZAeVub9a2I?si=pEChx449ZNi3M3bD&t=549" 2>/dev/null || printf "%b\n" "${RED}⚠ No se pudo abrir el navegador automáticamente. Abre el link manualmente: https://youtu.be/4ZAeVub9a2I?si=pEChx449ZNi3M3bD&t=549${NC}"
 }
@@ -605,10 +643,13 @@ prompt_install "instalar JDownloader" flatpak install -y flathub org.jdownloader
 # ==========================================================
 print_section "Personalización (Wallpaper Engine con KDE)"
 
+prompt_install "instalar Waywallen" flatpak install -y flathub org.waywallen.waywallen
+prompt_install "descargar el plugin open-wallpaper-engine para Waywallen en Descargas" download_waywallen_plugin
+
 printf "%b\n" "${YELLOW}Guía de configuración:${NC}"
 echo "1. Instalar Wallpaper Engine: Desde Steam"
-echo "2. Instalar Waywallen: Darle click derecho al fondo de pantalla > Escritorio e imagen de fondo > Obtener nuevos complementos > Waywallen"
-echo "3. Descargar Plugin: https://github.com/waywallen/open-wallpaper-engine/releases > Descargar org x86 > no descomprimir"
+echo "2. Instalar Waywallen: Desde Flatpak"
+echo "3. Descargar Plugin: Descargado en ~/Descargas con curl > no descomprimir"
 echo "4. Instalar Plugin: Abrir Waywallen > Plugins > Añadir > Seleccionar el zip"
 echo "5. Configurar ruta de Steam: Abrir Waywallen > Library Manager > Añadir con wallpaper > Insertar ruta ~/.steam/steam/steamapps/"
 echo "6. Habilitar fondo de pantalla: Darle click derecho al fondo de pantalla > Escritorio e imagen de fondo > Tipo de fondo: Waywallen"
