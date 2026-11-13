@@ -148,14 +148,6 @@ install_powershell() {
   return 1
 }
 
-install_postman() {
-  if command -v snap &>/dev/null; then
-    sudo snap install postman
-  else
-    flatpak install -y flathub com.getpostman.Postman
-  fi
-}
-
 install_nodejs() {
   curl -fsSL https://deb.nodesource.com/setup_lts.x | sudo -E bash -
   sudo apt install nodejs -y
@@ -464,13 +456,6 @@ install_artcraft() {
   fi
 }
 
-install_onlyoffice() {
-  wget https://download.onlyoffice.com/install/desktop/editors/linux/onlyoffice-desktopeditors_amd64.deb -O /tmp/onlyoffice.deb
-  chmod +x /tmp/onlyoffice.deb
-  sudo apt install /tmp/onlyoffice.deb -y
-  rm -f /tmp/onlyoffice.deb
-}
-
 install_gdsync() {
   printf "%b\n" "${GREEN}✓ Verificando e instalando dependencias (FUSE3 y Python3-PyQt6)...${NC}"
   sudo apt install -y fuse3 python3-pyqt6
@@ -583,7 +568,7 @@ prompt_install "instalar GitHub CLI (gh)" sudo apt install gh -y
 prompt_install "instalar Vim" sudo apt install vim -y
 prompt_install "instalar Htop" sudo apt install htop -y
 prompt_install "instalar Btop" sudo apt install btop -y
-prompt_install "instalar Postman" install_postman
+prompt_install "instalar Postman" flatpak install -y flathub com.getpostman.Postman
 prompt_install "instalar Node.js y npm (LTS)" install_nodejs
 prompt_install "instalar Docker y Docker Compose" install_docker
 prompt_install "instalar Visual Studio Code" install_vscode
@@ -628,8 +613,8 @@ prompt_install "instalar TLauncher" install_tlauncher
 # ==========================================================
 print_section "Ofimática & Herramientas"
 
-prompt_install "instalar ArtCraft (Launcher de herramientas open source de Abode y Microsoft)" install_artcraft
-prompt_install "instalar OnlyOffice (Herramientas open source de Microsoft)" install_onlyoffice
+prompt_install "instalar ArtCraft" install_artcraft
+prompt_install "instalar OnlyOffice" flatpak install -y flathub org.onlyoffice.desktopeditors
 prompt_install "instalar MarkText" flatpak install -y flathub com.github.marktext.marktext
 prompt_install "instalar Mousepad" sudo apt install mousepad -y
 prompt_install "instalar Filezilla" sudo apt install filezilla -y
